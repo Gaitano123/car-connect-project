@@ -4,7 +4,13 @@ from sqlalchemy import create_engine, Column, String, Integer, ForeignKey
 
 
 engine = create_engine('sqlite:///project.db')
+Session = sessionmaker( bind = engine)
+session = Session()
+
+
 Base = declarative_base()
+
+
 
 class Garage(Base):
     __tablename__ = 'garages'
@@ -37,16 +43,7 @@ class Car(Base):
     owner_id = Column(Integer(), ForeignKey('owners.id'))
     garage_id = Column(Integer(), ForeignKey('garages.id'))
     
-    garage = relationship("Garage", back_populates='cars')
-    owner = relationship('Owner', back_populates='cars')
+    garage = relationship("Garage", back_populates='car')
+    owner = relationship('Owner', back_populates='car')
     
     
-
-
-
-if __name__ == '__main__':
-    
-    Base.metadata.create_all(engine)
-    
-    Session = sessionmaker( bind = engine)
-    session = Session()
