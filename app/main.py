@@ -140,6 +140,47 @@ def add_car(make, model, year, owner_id, garage_id):
     session.commit()
     click.secho('car has been added successfully!', fg='blue')
 
+
+@click.command()
+@click.option('--id', '-id', prompt='Enter the car id')
+@click.option('--owner-id', '-oi', prompt='Enter the new owner id')
+def update_owner(id, owner_id):
+    update = session.query(Car).filter(Car.id == id).first()
+    if update:
+        update.owner_id = owner_id
+        session.commit()
+        click.secho('car owner has been updated successfully!', fg='blue')
+    else:
+        click.secho(f'Car with the id: {id} is not found!', fg='yellow')
+
+
+@click.command()
+@click.option('--id', '-id', prompt='Enter the car id', type=int)
+@click.option('--garage-id', '-gi', prompt='Enter the new garage id', type=int)
+def update_garage(id, garage_id):
+    update= session.query(Car).filter(Car.id == id).first()
+    if update:
+        update.garage_id = garage_id
+        session.commit()
+        click.secho('car garage has been updated successfully!', fg='blue')
+    else:
+        click.secho(f'Car with the id: {id} is not found!', fg='yellow')
+        
+        
+
+@click.command()
+@click.option('--id', '-id', prompt='Enter the id of the car')
+def delete_car(id):
+    to_delete = session.query(Car).filter(Car.id == id)
+    if to_delete:
+        session.delete(to_delete)
+        session.commit()
+        click.secho('Car deleted sucessfully!',fg='blue')
+    else:
+        click.secho(f'Car with id: {id} not found!', fg='yellow')
+
+    
+
 if __name__ == "__main__":
     list_garage()
     add_garage()
@@ -153,3 +194,6 @@ if __name__ == "__main__":
     delete_owner()
     list_cars()
     add_car()
+    update_owner()
+    update_garage()
+    delete_car()
