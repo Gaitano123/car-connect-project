@@ -3,9 +3,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from model import Garage, Owner, Car
 
+
+
 engine = create_engine('sqlite:///project.db')
 Session = sessionmaker(bind=engine)
 session = Session()
+
+
 
 @click.group()
 def cli():
@@ -15,6 +19,9 @@ def cli():
 
 @cli.command()
 def list_garage():
+    
+    """LIST ALL THE GARAGES IN THE TABLE"""
+    
     click.secho("LIST OF GARAGES",fg='blue' )
     garages = session.query(Garage).all()
     for garage in garages:
@@ -26,6 +33,9 @@ def list_garage():
 @click.option('--name', '-n', prompt='Enter garage name')
 @click.option('--location', '-l', prompt='Enter location')
 def add_garage(name, location):
+    
+    """ADD'S A NEW GARAGE TO THE DATABASE"""
+    
     new_garage = Garage(name=name, location=location)
     session.add(new_garage)
     session.commit()
@@ -36,6 +46,9 @@ def add_garage(name, location):
 @cli.command()
 @click.option('--name', '-sg', prompt='Search for garage')
 def search_garage(name):
+    
+    """SEARCH FOR A GARAGE BY THE NAME"""
+    
     garage = session.query(Garage).filter(Garage.name == name).first()
     if garage:
         click.secho(f'found {garage.id}: {garage.name} in {garage.location}', fg='blue')
@@ -47,6 +60,9 @@ def search_garage(name):
 @cli.command()
 @click.option('--location', '-l', prompt='Enter location')
 def search_garage_location(location):
+    
+    """SEARCH FOR GARAGES IN DESIRED LOCATION"""
+    
     garages = session.query(Garage).filter(Garage.location == location).all()
     if garages:
         click.secho(f'LIST OF GARAGES FOUND IN: {location}', fg='blue')
@@ -61,6 +77,9 @@ def search_garage_location(location):
 @click.option('--id', '-id', prompt='Enter id to be updated')
 @click.option('--new-name', '-nn', prompt='Enter the new name')
 def update_garage_name(id, new_name):
+    
+    """UPDATE NAME OF A GARAGE USING IT'S ID"""
+    
     update_garage = session.query(Garage).filter(Garage.id == id).first()
     if update_garage:
         session.query(Garage).filter(Garage.id == update_garage.id).update({
@@ -76,6 +95,9 @@ def update_garage_name(id, new_name):
 @cli.command()
 @click.option('--id', '-id', prompt='Enter garage id')
 def search_garage_car(id):
+    
+    """SEARCH FOR CARS THAT ARE SERVICED BY A CERTAIN GARAGAE"""
+    
     garage = session.query(Garage).filter(Garage.id == id).first()
     if garage:
         click.secho(f'LIST OF CARS SERVICED AT: {garage.name}', fg='blue')
@@ -91,6 +113,9 @@ def search_garage_car(id):
 @cli.command()
 @click.option('--id', '-dn', prompt='Enter the Garage id to be deleted')
 def delete_garage(id):
+    
+    """DELETES A GARAGE FROM THE DATABASE"""
+    
     to_delete = session.query(Garage).filter(Garage.id == id).first()
     if to_delete:
         session.delete(to_delete)
@@ -103,6 +128,9 @@ def delete_garage(id):
 
 @cli.command()
 def list_owners():
+    
+    """LIST ALL THE OWNERS"""
+    
     click.secho("LIST OF OWNERS",fg='blue' )
     owners = session.query(Owner).all()
     for owner in owners:
@@ -113,6 +141,9 @@ def list_owners():
 @cli.command()
 @click.option('--name', '-n', prompt='Enter new owner name')
 def add_owner(name):
+    
+    """ADD A NEW OWNER """
+    
     new_owner = Owner(name=name)
     session.add(new_owner)
     session.commit()
@@ -123,6 +154,9 @@ def add_owner(name):
 @cli.command()
 @click.option('--name', '-sn', prompt='Search for owner')
 def search_owner(name):
+    
+    """SEARCH FOR AN OWNER WITH SPECIFIC NAME"""
+    
     found = session.query(Owner).filter(Owner.name == name).first()
     if found:
         click.secho(f'Found Owner {found.id}: {found.name}', fg='blue')
@@ -130,11 +164,15 @@ def search_owner(name):
         click.secho(f'Owner {name} not found!', fg='yellow')
 
 
+
 @cli.command()
-@click.option('--name', '-on', prompt="Enter name to be updated")
-@click.option('--new-name', '-nn', prompt="Enter name")
-def update_owner(name, new_name):
-    update = session.query(Owner).filter(Owner.name == name).first()
+@click.option('--id', '-on', prompt="Enter id")
+@click.option('--new-name', '-nn', prompt="Enter new name")
+def update_owner(id, new_name):
+    
+    """UPDATE ANOWNER'S NAME"""
+    
+    update = session.query(Owner).filter(Owner.id == id).first()
     if update:
         update.name = new_name
         session.commit()
@@ -147,6 +185,9 @@ def update_owner(name, new_name):
 @cli.command()
 @click.option('--id', '-id', prompt='Enter owner id')
 def search_owner_car(id):
+    
+    """SEARCH FOR CARS THAT BELONG TO AN INDIVIDUAL OWNER"""
+    
     owner = session.query(Owner).filter(Owner.id == id).first()
     if owner:
         click.secho(f'LIST OF CARS OWNED BY: {owner.name}', fg='blue')
@@ -161,6 +202,9 @@ def search_owner_car(id):
 @cli.command()
 @click.option('--id', '-id', prompt="Enter Owner id")
 def delete_owner(id):
+    
+    """DELETE OWNER'S DETAILS"""
+    
     to_delete = session.query(Owner).filter(Owner.id == id).first()
     if to_delete:
         session.delete(to_delete)
@@ -170,12 +214,18 @@ def delete_owner(id):
         click.secho(f'Owner with id: {id} not found!', fg='yellow')
 
 
+
 @cli.command()
 def list_cars():
+    
+    """LIST ALL CARS"""
+    
     cars = session.query(Car).all()
     click.secho('LIST OF CARS', fg='blue')
     for car in cars:
         click.echo(f'{car.id}: {car.make} {car.model}')
+  
+  
         
 @cli.command()
 @click.option('--make', '-mk', prompt='Enter make')
@@ -184,16 +234,23 @@ def list_cars():
 @click.option('--owner-id', '-oi', prompt='Enter owner id')
 @click.option('--garage-id', '-gi', prompt='Enter garage id')
 def add_car(make, model, year, owner_id, garage_id):
+    
+    """ADD A NEW CAR"""
+    
     car= Car(make= make, model=model, year=year, owner_id=owner_id, garage_id=garage_id)
     session.add(car)
     session.commit()
     click.secho('car has been added successfully!', fg='blue')
 
 
+
 @cli.command()
 @click.option('--id', '-id', prompt='Enter the car id')
 @click.option('--owner-id', '-oi', prompt='Enter the new owner id')
-def update_owner(id, owner_id):
+def update_car_owner(id, owner_id):
+    
+    """UPDATE CAR OWNER"""
+    
     update = session.query(Car).filter(Car.id == id).first()
     if update:
         update.owner_id = owner_id
@@ -203,10 +260,14 @@ def update_owner(id, owner_id):
         click.secho(f'Car with the id: {id} is not found!', fg='yellow')
 
 
+
 @cli.command()
 @click.option('--id', '-id', prompt='Enter the car id', type=int)
 @click.option('--garage-id', '-gi', prompt='Enter the new garage id', type=int)
-def update_garage(id, garage_id):
+def update_car_garage(id, garage_id):
+    
+    """UPDATE GARAGE SERVICING THE CAR"""
+    
     update= session.query(Car).filter(Car.id == id).first()
     if update:
         update.garage_id = garage_id
@@ -220,6 +281,9 @@ def update_garage(id, garage_id):
 @cli.command()
 @click.option('--id', '-id', prompt='Enter the id of the car')
 def delete_car(id):
+    
+    """DELETE A CAR"""
+    
     to_delete = session.query(Car).filter(Car.id == id).first()
     if to_delete:
         session.delete(to_delete)
@@ -231,7 +295,10 @@ def delete_car(id):
 
 
 @cli.command()
-def list_cars_names():
+def list_all():
+    
+    """LIST ALL CARS INCLUDING THEIR OWNER AND GARAGE DETAILS"""
+    
     cars = session.query(Car).all()
     click.secho('LIST OF CARS', fg='blue')
     for car in cars:
@@ -248,6 +315,5 @@ def list_cars_names():
 
 
     
-
 if __name__ == "__main__":
     cli()
