@@ -21,6 +21,9 @@ class Garage(Base):
     
     car = relationship('Car', back_populates='garage')
     
+    def __repr__(self):
+        return f"{self.id}: {self.name} in {self.location} \n"
+    
     
     
 class Owner(Base):
@@ -30,6 +33,9 @@ class Owner(Base):
     name = Column(String())
     
     car = relationship('Car', back_populates='owner')
+    
+    def __repr__(self):
+        return f"{self.id}: {self.name} \n"
     
     
     
@@ -46,5 +52,8 @@ class Car(Base):
     
     garage = relationship("Garage", back_populates='car')
     owner = relationship('Owner', back_populates='car')
+    
+    def __repr__(self):
+        return f"{self.id}: {self.make} {self.model} {self.year} {self.owner_id} {self.garage_id} \n"
     
     
